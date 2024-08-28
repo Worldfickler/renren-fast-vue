@@ -149,6 +149,7 @@ export default {
   components: { Category, AddOrUpdate },
   data() {
     return {
+      catId: 0,
       dataForm: {
         key: ""
       },
@@ -170,12 +171,16 @@ export default {
       console.log(data.catId);
       //   this.dataForm.catelogId = data.catId;
       //   this.getDataList();
+      if (node.level == 3) {
+        this.catId = data.catId;
+        this.getDataList();
+      }
     },
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/product/attrgroup/list"),
+        url: this.$http.adornUrl(`/product/attrgroup/list/${this.catId}`),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
