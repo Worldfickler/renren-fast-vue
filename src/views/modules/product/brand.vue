@@ -272,6 +272,9 @@ export default {
         });
       });
     }
+  },
+  created() {
+    this.getDataList();
   }
 };
 </script>
