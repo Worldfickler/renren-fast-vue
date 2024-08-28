@@ -27,10 +27,15 @@
         <el-input v-model="dataForm.icon" placeholder="组图标"></el-input>
       </el-form-item>
       <el-form-item label="所属分类id" prop="catelogId">
-        <el-input
+        <!-- <el-input
           v-model="dataForm.catelogId"
           placeholder="所属分类id"
-        ></el-input>
+        ></el-input> -->
+        <el-cascader
+          v-model="dataForm.catelogIds"
+          :options="categorys"
+          :props="props"
+        ></el-cascader>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -44,6 +49,12 @@
 export default {
   data() {
     return {
+      props: {
+        value: "catId",
+        label: "name",
+        children: "children"
+      },
+      categorys: [],
       visible: false,
       dataForm: {
         attrGroupId: 0,
@@ -51,7 +62,8 @@ export default {
         sort: "",
         descript: "",
         icon: "",
-        catelogId: ""
+        catelogIds: [],
+        catelogId: 0
       },
       dataRule: {
         attrGroupName: [
@@ -69,6 +81,14 @@ export default {
     };
   },
   methods: {
+    getCategorys() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get"
+      }).then(({ data }) => {
+        this.categorys = data.data;
+      });
+    },
     init(id) {
       this.dataForm.attrGroupId = id || 0;
       this.visible = true;
@@ -110,7 +130,7 @@ export default {
               sort: this.dataForm.sort,
               descript: this.dataForm.descript,
               icon: this.dataForm.icon,
-              catelogId: this.dataForm.catelogId
+              catelogId: this.dataForm.catelogIds[this.dataForm.catelogIds.length - 1]
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
@@ -130,6 +150,9 @@ export default {
         }
       });
     }
+  },
+  created() {
+    this.getCategorys();
   }
 };
 </script>
