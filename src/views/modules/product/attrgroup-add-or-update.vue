@@ -3,6 +3,7 @@
     :title="!dataForm.attrGroupId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible"
+    @closed="dialogClose"
   >
     <el-form
       :model="dataForm"
@@ -32,7 +33,9 @@
           placeholder="所属分类id"
         ></el-input> -->
         <el-cascader
-          v-model="dataForm.catelogIds"
+          filterable
+          placeholder="试试搜索：手机"
+          v-model="dataForm.catelogPath"
           :options="categorys"
           :props="props"
         ></el-cascader>
@@ -62,7 +65,7 @@ export default {
         sort: "",
         descript: "",
         icon: "",
-        catelogIds: [],
+        catelogPath: [],
         catelogId: 0
       },
       dataRule: {
@@ -81,6 +84,9 @@ export default {
     };
   },
   methods: {
+    dialogClose() {
+      this.dataForm.catelogPath = [];
+    },
     getCategorys() {
       this.$http({
         url: this.$http.adornUrl("/product/category/list/tree"),
@@ -108,6 +114,8 @@ export default {
               this.dataForm.descript = data.attrGroup.descript;
               this.dataForm.icon = data.attrGroup.icon;
               this.dataForm.catelogId = data.attrGroup.catelogId;
+              // 查出 categoryId 的完整路径
+              this.dataForm.catelogPath = data.attrGroup.catelogPath;
             }
           });
         }
@@ -130,7 +138,9 @@ export default {
               sort: this.dataForm.sort,
               descript: this.dataForm.descript,
               icon: this.dataForm.icon,
-              catelogId: this.dataForm.catelogIds[this.dataForm.catelogIds.length - 1]
+              catelogId: this.dataForm.catelogPath[
+                this.dataForm.catelogPath.length - 1
+              ]
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
